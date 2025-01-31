@@ -1,0 +1,47 @@
+import * as THREE from "three";
+import { App } from "./App";
+import { AppInputProperties } from "./AppInputProperties";
+
+/**
+ * This is the {{pascalCase name}} app.
+ */
+class {{pascalCase name}} extends App {
+	width: number;
+	height: number;
+	inputProperties: AppInputProperties;
+	
+	constructor() {
+		const width: number = document.body.clientWidth;
+		const height: number = document.body.clientHeight;
+
+		super(
+			"{{sentenceCase name}}",
+			new THREE.Scene(),
+			new THREE.OrthographicCamera(
+				-width / 2,
+				width / 2,
+				height / 2,
+				-height / 2,
+				1,
+				1000
+			)
+		);
+		
+		this.width = width;
+		this.height = height;
+		this.inputProperties = new AppInputProperties({});
+	}
+	
+	setup(): void {
+		console.log("{{sentenceCase name}} - setup function");
+	}
+	
+	teardown(): void {
+		console.log("{{sentenceCase name}} - teardown function");
+	}
+	
+	animate(): void {
+		console.log("{{sentenceCase name}} - aniamte function");
+	}
+
+} export { {{pascalCase name}} };
