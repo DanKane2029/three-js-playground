@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 /**
- *
+ * A Rectangle that can be rendered in a Three.js scene.
  */
 class Rectangle extends THREE.Object3D {
 	constructor(
