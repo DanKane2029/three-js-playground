@@ -1,4 +1,4 @@
-import { ShaderMaterialParameters, Vector2, Vector4 } from "three";
+import type { ShaderMaterialParameters, Vector2, Vector4 } from "three";
 
 /**
  * A function that creates the shader programs and uniforms to display the mandlebrot set.

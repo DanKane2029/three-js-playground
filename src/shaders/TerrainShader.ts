@@ -1,4 +1,5 @@
-import { ShaderMaterialParameters, DataTexture, GLSL3, Vector2 } from "three";
+import { GLSL3 } from "three";
+import type { ShaderMaterialParameters, DataTexture, Vector2 } from "three";
 
 /**
  * A function that creates a Terrain shader programs and uniforms.
