@@ -41,6 +41,9 @@ templates in `code-generators/`.
 
 ## The apps
 
+Each app has an educational deep-dive — the concepts and math behind it — in
+[`docs/apps/`](docs/apps/).
+
 ### Groovy Texture
 
 A vibrant 1970s-inspired five-pointed star. A fragment shader uses a signed
