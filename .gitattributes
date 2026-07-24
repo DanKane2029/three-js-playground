@@ -1,0 +1,10 @@
+# Normalize line endings to LF on checkin to stop CRLF churn across platforms.
+* text=auto eol=lf
+
+# Binary assets
+*.ico binary
+*.png binary
+*.jpg binary
+*.glb binary
+*.gltf binary
+*.hdr binary

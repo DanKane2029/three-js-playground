@@ -1,128 +1,108 @@
-import * as THREE from "three";
-import { App } from "../App";
-import { AppInputProperties, ButtonInput } from "../AppInputProperties";
+import {
+	Clock,
+	DataTexture,
+	FloatType,
+	Mesh,
+	PerspectiveCamera,
+	RepeatWrapping,
+	RGFormat,
+	Scene,
+	ShaderMaterial,
+	SphereGeometry,
+	Vector2,
+} from "three";
+import type { FolderApi } from "tweakpane";
+import { App } from "../../core/App";
 import { TerrainShader } from "../../shaders/TerrainShader";
 import { randomVec2Grid } from "./perlinNoise";
-import { randFloat } from "three/src/math/MathUtils";
 
-/**
- * This is the TerrainGenerator app.
- */
-class TerrainGenerator extends App {
-	width: number;
-	height: number;
-	inputProperties: AppInputProperties;
-	clock: THREE.Clock;
-	world: THREE.Mesh;
-	terrainMat: THREE.ShaderMaterial;
-	perlinNoiseVecGrid: THREE.Vector2[][];
-	gridDensityX: number;
-	gridDensityY: number;
+/** A spherical planet displaced by Perlin noise in the vertex shader. */
+export class TerrainGenerator extends App {
+	readonly name = "Terrain Generator";
+	readonly description =
+		"A planet whose surface is displaced by Perlin noise.";
+
+	private readonly params = { rotationSpeed: 0.005, wireframe: false };
+	private readonly gridDensity = new Vector2(20, 20);
+	private readonly planeSize = new Vector2(40, 30);
+	private readonly clock = new Clock();
+
+	private world!: Mesh;
+	private material!: ShaderMaterial;
+	private geometry!: SphereGeometry;
+	private texture!: DataTexture;
 
 	constructor() {
-		const width: number = document.body.clientWidth;
-		const height: number = document.body.clientHeight;
-
-		super(
-			"Terrain generator",
-			new THREE.Scene(),
-			new THREE.PerspectiveCamera(75, width / height, 0.01, 1000)
-		);
-
-		this.width = width;
-		this.height = height;
-		this.gridDensityX = 20;
-		this.gridDensityY = 20;
-
-		this.inputProperties = new AppInputProperties({
-			Regenerate: new ButtonInput(
-				"Regenerate",
-				(() => {
-					this.perlinNoiseVecGrid = randomVec2Grid(
-						this.gridDensityX,
-						this.gridDensityY
-					);
-					this.updateShaderUniforms();
-				}).bind(this)
-			),
-		});
-
-		this.clock = new THREE.Clock();
+		super();
+		this.scene = new Scene();
+		this.camera = new PerspectiveCamera(60, 1, 0.01, 1000);
 	}
 
 	setup(): void {
-		const planesize = new THREE.Vector2(40, 30);
-		this.perlinNoiseVecGrid = randomVec2Grid(
-			this.gridDensityX,
-			this.gridDensityY
-		);
-
 		this.clock.start();
-		this.camera.position.set(0, 20, 0);
-		this.camera.lookAt(0, 0, 0);
+		this.camera.position.set(0, 8, 22);
+		(this.camera as PerspectiveCamera).lookAt(0, 0, 0);
 
-		const sphereGeometry = new THREE.SphereGeometry(10, 512, 512);
-
-		const buf = this.perlinNoiseVecGrid
-			.flat()
-			.map((v) => [v.x, v.y])
-			.flat();
-
-		const perlinGradientsDataTex = new THREE.DataTexture(
-			new Float32Array(buf),
-			this.gridDensityX,
-			this.gridDensityY,
-			THREE.RGFormat,
-			THREE.FloatType
-		);
-		perlinGradientsDataTex.wrapS = THREE.RepeatWrapping;
-		perlinGradientsDataTex.wrapT = THREE.RepeatWrapping;
-		perlinGradientsDataTex.needsUpdate = true;
-
-		this.terrainMat = new THREE.ShaderMaterial(
-			TerrainShader(
-				this.clock.getElapsedTime(),
-				perlinGradientsDataTex,
-				planesize
-			)
+		this.geometry = new SphereGeometry(10, 512, 512);
+		this.texture = this.buildGradientTexture();
+		this.material = new ShaderMaterial(
+			TerrainShader(0, this.texture, this.planeSize)
 		);
 
-		this.terrainMat.side = THREE.DoubleSide;
-		this.world = new THREE.Mesh(sphereGeometry, this.terrainMat);
-		this.world.position.set(0, 0, 0);
-		this.world.rotation.set(90, 0, 0);
+		this.world = new Mesh(this.geometry, this.material);
 		this.scene.add(this.world);
 	}
 
-	teardown(): void {
-		console.log("Terrain generator - teardown function");
+	resize(width: number, height: number): void {
+		const camera = this.camera as PerspectiveCamera;
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
 	}
 
-	updateShaderUniforms() {
-		this.terrainMat.uniforms["time"].value = this.clock.getElapsedTime();
-
-		const buf = this.perlinNoiseVecGrid
-			.flat()
-			.map((v) => [v.x, v.y])
-			.flat();
-
-		const perlinGradientsDataTex = new THREE.DataTexture(
-			new Float32Array(buf),
-			this.gridDensityX,
-			this.gridDensityY,
-			THREE.RGFormat,
-			THREE.FloatType
+	private buildGradientTexture(): DataTexture {
+		const grid = randomVec2Grid(this.gridDensity.x, this.gridDensity.y);
+		const data = new Float32Array(grid.flat().flatMap((v) => [v.x, v.y]));
+		const texture = new DataTexture(
+			data,
+			this.gridDensity.x,
+			this.gridDensity.y,
+			RGFormat,
+			FloatType
 		);
-		perlinGradientsDataTex.needsUpdate = true;
-
-		this.terrainMat.uniforms["perlinNoiseGradientGrid"].value =
-			perlinGradientsDataTex;
-
-		this.terrainMat.needsUpdate = true;
+		texture.wrapS = RepeatWrapping;
+		texture.wrapT = RepeatWrapping;
+		texture.needsUpdate = true;
+		return texture;
 	}
 
-	animate(): void {
-		this.world.rotateY(0.005);
+	private regenerate(): void {
+		this.texture.dispose();
+		this.texture = this.buildGradientTexture();
+		this.material.uniforms.perlinNoiseGradientGrid.value = this.texture;
+	}
+
+	update(_dt: number, elapsed: number): void {
+		this.world.rotation.y = elapsed * this.params.rotationSpeed * 40;
+		this.material.wireframe = this.params.wireframe;
+	}
+
+	setupControls(folder: FolderApi): void {
+		folder.addButton({ title: "Regenerate" }).on("click", () => {
+			this.regenerate();
+		});
+		folder.addBinding(this.params, "rotationSpeed", {
+			min: 0,
+			max: 0.05,
+			step: 0.001,
+		});
+		folder.addBinding(this.params, "wireframe");
+	}
+
+	dispose(): void {
+		this.clock.stop();
+		this.geometry.dispose();
+		this.material.dispose();
+		this.texture.dispose();
+		this.scene.clear();
 	}
 }
-export { TerrainGenerator };

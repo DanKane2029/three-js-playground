@@ -1,4 +1,4 @@
-import { ShaderMaterialParameters, Vector4 } from "three";
+import type { ShaderMaterialParameters, Vector4 } from "three";
 
 /**
  * A function that creates the shader programs and uniforms that will display the groovy texture.

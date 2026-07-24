@@ -1,47 +1,55 @@
-import * as THREE from "three";
-import { App } from "./App";
-import { AppInputProperties } from "./AppInputProperties";
+import {
+	Color,
+	Mesh,
+	MeshNormalMaterial,
+	PerspectiveCamera,
+	Scene,
+	TorusKnotGeometry,
+} from "three";
+import type { FolderApi } from "tweakpane";
+import { App } from "../core/App";
+import { disposeObject } from "../core/dispose";
 
-/**
- * This is the {{pascalCase name}} app.
- */
-class {{pascalCase name}} extends App {
-	width: number;
-	height: number;
-	inputProperties: AppInputProperties;
-	
+/** The {{sentenceCase name}} app. */
+export class {{pascalCase name}} extends App {
+	readonly name = "{{sentenceCase name}}";
+	readonly description = "";
+
+	private readonly params = { speed: 1 };
+	private mesh!: Mesh;
+
 	constructor() {
-		const width: number = document.body.clientWidth;
-		const height: number = document.body.clientHeight;
-
-		super(
-			"{{sentenceCase name}}",
-			new THREE.Scene(),
-			new THREE.OrthographicCamera(
-				-width / 2,
-				width / 2,
-				height / 2,
-				-height / 2,
-				1,
-				1000
-			)
-		);
-		
-		this.width = width;
-		this.height = height;
-		this.inputProperties = new AppInputProperties({});
+		super();
+		this.scene = new Scene();
+		this.scene.background = new Color(0x0a0a12);
+		this.camera = new PerspectiveCamera(60, 1, 0.1, 100);
+		this.camera.position.set(0, 0, 5);
 	}
-	
+
 	setup(): void {
-		console.log("{{sentenceCase name}} - setup function");
-	}
-	
-	teardown(): void {
-		console.log("{{sentenceCase name}} - teardown function");
-	}
-	
-	animate(): void {
-		console.log("{{sentenceCase name}} - aniamte function");
+		this.mesh = new Mesh(
+			new TorusKnotGeometry(1, 0.3, 128, 16),
+			new MeshNormalMaterial()
+		);
+		this.scene.add(this.mesh);
 	}
 
-} export { {{pascalCase name}} };
+	resize(width: number, height: number): void {
+		const camera = this.camera as PerspectiveCamera;
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
+	}
+
+	update(dt: number): void {
+		this.mesh.rotation.y += dt * this.params.speed;
+	}
+
+	setupControls(folder: FolderApi): void {
+		folder.addBinding(this.params, "speed", { min: 0, max: 5, step: 0.1 });
+	}
+
+	dispose(): void {
+		disposeObject(this.scene);
+		this.scene.clear();
+	}
+}

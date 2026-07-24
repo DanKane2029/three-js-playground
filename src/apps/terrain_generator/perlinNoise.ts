@@ -1,32 +1,22 @@
-import * as THREE from "three";
-import { randFloat } from "three/src/math/MathUtils";
+import { Vector2 } from "three";
 
-function randomVec2(): THREE.Vector2 {
-	return new THREE.Vector2(randFloat(-1, 1), randFloat(-1, 1)).normalize();
+function randomVec2(): Vector2 {
+	return new Vector2(
+		Math.random() * 2 - 1,
+		Math.random() * 2 - 1
+	).normalize();
 }
 
-function randomVec2Grid(width: number, height: number): THREE.Vector2[][] {
-	const borderVec = randomVec2();
-	const grid = Array.from({ length: height })
-		.fill(0)
-		.map((_, i: number) =>
-			Array.from({ length: width })
-				.fill(0)
-				.map((v: THREE.Vector2, j: number) => {
-					if (i === height - 1 || j === width - 1) {
-						v = borderVec;
-					} else {
-						v = randomVec2();
-					}
-					return v;
-				})
-		);
-
-	// grid.map((row: THREE.Vector2[]) => {
-	// 	row[width - 1] = row[0];
-	// });
-
-	return grid;
+/**
+ * Builds a `height` x `width` grid of random unit gradient vectors used as the
+ * corner gradients for the Perlin-noise terrain. The last row and column share
+ * a single vector so the noise tiles seamlessly across the sphere seam.
+ */
+export function randomVec2Grid(width: number, height: number): Vector2[][] {
+	const border = randomVec2();
+	return Array.from({ length: height }, (_, i) =>
+		Array.from({ length: width }, (_, j) =>
+			i === height - 1 || j === width - 1 ? border : randomVec2()
+		)
+	);
 }
-
-export { randomVec2Grid };

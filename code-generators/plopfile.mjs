@@ -16,14 +16,14 @@ export default function (plop) {
 			},
 			{
 				type: "append",
-				path: "../src/index.ts",
+				path: "../src/main.ts",
 				pattern: /@imported-apps-marker/g,
 				template:
 					'import { {{pascalCase name}} } from "./apps/{{name}}";',
 			},
 			{
 				type: "append",
-				path: "../src/index.ts",
+				path: "../src/main.ts",
 				pattern: /@app-list-marker/g,
 				template: "\tnew {{pascalCase name}}(),",
 			},
