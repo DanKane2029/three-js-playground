@@ -54,12 +54,18 @@ $Z_{n+1}=Z_n^2+C$ and coloring each pixel by how quickly the sequence escapes.
 Drag to pan and scroll to zoom; the five gradient colors and iteration count are
 adjustable.
 
-### Terrain Generator
+### Planet Generator
 
-A spherical planet whose surface is displaced by Perlin noise. A gradient grid is
-uploaded as a data texture and sampled in the vertex shader to push vertices
-along their normals — positive height becomes green land, negative becomes blue
-water. Regenerate the noise, change the spin, or toggle wireframe.
+A procedural mini planet. Seamless 3D simplex-noise FBM (sampled on the sphere,
+so there's no UV seam or pole pinching) displaces the surface in the vertex
+shader, flattening everything below sea level into a smooth ocean. The fragment
+shader re-evaluates elevation per pixel for smooth coastlines, colors the surface
+by elevation biome (deep ocean → shallow water → beach → grass → forest → rock →
+snow, with polar ice caps), and lights it with a sun direction plus specular
+water. A fresnel atmosphere glow, a drifting cloud layer, and a starfield
+complete the scene. Drag to orbit and scroll to zoom. Controls include planet
+presets (Earth-like, Desert, Ice, Lava, Alien), a seed regenerator, and sea
+level, amplitude, frequency, octaves, atmosphere, clouds, and biome colors.
 
 ### Bloom Field
 
