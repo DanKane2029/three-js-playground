@@ -11,6 +11,8 @@ import { BloomField } from "./apps/BloomField";
 import { ParticleFlow } from "./apps/ParticleFlow";
 import { PbrViewer } from "./apps/PbrViewer";
 import { Pixelate } from "./apps/Pixelate";
+import { Raymarch } from "./apps/Raymarch";
+import { Mandelbulb } from "./apps/Mandelbulb";
 
 const canvas = document.getElementById("scene") as HTMLCanvasElement;
 
@@ -23,6 +25,8 @@ const apps: App[] = [
 	new ParticleFlow(),
 	new PbrViewer(),
 	new Pixelate(),
+	new Raymarch(),
+	new Mandelbulb(),
 ];
 
 new Playground(canvas, apps);
