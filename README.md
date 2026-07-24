@@ -89,3 +89,17 @@ intensity, and auto-rotation.
 
 A spinning shape run through a custom pixelate post-process shader (a `ShaderPass`
 that snaps output pixels to a grid). Adjust the pixel size.
+
+### Raymarch SDF
+
+A fullscreen raymarched signed-distance-field scene: three animated primitives
+fused with a smooth minimum, on a checkered floor with soft shadows, ambient
+occlusion, and fog. Drag to orbit. Adjust animation speed, blend amount, an
+optional infinite domain repetition, fog, and the two-color palette.
+
+### Mandelbulb
+
+A fullscreen raymarched Mandelbulb — the 3D analogue of the Mandelbrot set —
+using the classic distance estimator with orbit-trap coloring and a glow halo.
+Drag to orbit and scroll to zoom. Adjust the power (optionally animated),
+iteration count, glow, and colors.
