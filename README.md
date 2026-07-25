@@ -106,3 +106,11 @@ A fullscreen raymarched Mandelbulb — the 3D analogue of the Mandelbrot set —
 using the classic distance estimator with orbit-trap coloring and a glow halo.
 Drag to orbit and scroll to zoom. Adjust the power (optionally animated),
 iteration count, glow, and colors.
+
+### Fluid
+
+A real-time GPU fluid simulation: a grid-based Navier–Stokes solver (Jos Stam's
+"stable fluids") that ping-pongs velocity, dye, and pressure through
+floating-point render targets, with semi-Lagrangian advection, vorticity
+confinement, and a Jacobi pressure solve. Drag to stir dye through the flow.
+Adjust curl, dissipation, pressure iterations, and splat radius.
