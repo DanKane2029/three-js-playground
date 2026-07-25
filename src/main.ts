@@ -13,6 +13,7 @@ import { PbrViewer } from "./apps/PbrViewer";
 import { Pixelate } from "./apps/Pixelate";
 import { Raymarch } from "./apps/Raymarch";
 import { Mandelbulb } from "./apps/Mandelbulb";
+import { FluidSim } from "./apps/FluidSim";
 
 const canvas = document.getElementById("scene") as HTMLCanvasElement;
 
@@ -27,6 +28,7 @@ const apps: App[] = [
 	new Pixelate(),
 	new Raymarch(),
 	new Mandelbulb(),
+	new FluidSim(),
 ];
 
 new Playground(canvas, apps);

@@ -15,6 +15,7 @@ graphics-specific ideas from the ground up.
 | [Pixelate](pixelate/) | Framebuffer post-processing, grid quantization, nearest sampling |
 | [Raymarch SDF](raymarch-sdf/) | Sphere tracing, SDF primitives, smooth unions, soft shadows, ambient occlusion |
 | [Mandelbulb](mandelbulb/) | Triplex numbers, distance-estimated fractals, orbit-trap coloring |
+| [Fluid](fluid/) | GPGPU Navier–Stokes, semi-Lagrangian advection, pressure projection |
 
 > Math is written in LaTeX and renders on GitHub. If you're reading this in a
 > plain text editor, the `$...$` and `$$...$$` blocks are formulas.
