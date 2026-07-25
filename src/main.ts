@@ -14,6 +14,7 @@ import { Pixelate } from "./apps/Pixelate";
 import { Raymarch } from "./apps/Raymarch";
 import { Mandelbulb } from "./apps/Mandelbulb";
 import { FluidSim } from "./apps/FluidSim";
+import { Ocean } from "./apps/Ocean";
 
 const canvas = document.getElementById("scene") as HTMLCanvasElement;
 
@@ -29,6 +30,7 @@ const apps: App[] = [
 	new Raymarch(),
 	new Mandelbulb(),
 	new FluidSim(),
+	new Ocean(),
 ];
 
 new Playground(canvas, apps);

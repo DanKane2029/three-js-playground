@@ -114,3 +114,11 @@ A real-time GPU fluid simulation: a grid-based Navier–Stokes solver (Jos Stam'
 floating-point render targets, with semi-Lagrangian advection, vorticity
 confinement, and a Jacobi pressure solve. Drag to stir dye through the flow.
 Adjust curl, dissipation, pressure iterations, and splat radius.
+
+### Ocean
+
+A 3D ocean of Gerstner (trochoidal) waves displaced in the vertex shader, with
+analytic normals, a Fresnel blend between deep water and a reflected procedural
+sky, specular sun glitter, foam on the crests, and realistic wave dispersion.
+Drag to orbit. Adjust amplitude, wavelength, choppiness, wind direction, speed,
+foam, water color, and the sun's position.
