@@ -4,6 +4,8 @@ A collection of small real-time graphics experiments built with
 [Three.js](https://threejs.org/) and TypeScript. Pick an app from the panel in
 the top-right corner and tweak its parameters live.
 
+**▶ Live demo: <https://dankane2029.github.io/three-js-playground/>**
+
 **Stack:** Three.js · TypeScript · [Vite](https://vite.dev/) ·
 [Tweakpane](https://tweakpane.github.io/docs/) · ESLint 9 · Prettier 3.
 
@@ -20,8 +22,9 @@ npm run lint      # lint with ESLint
 npm run format    # format with Prettier
 ```
 
-The app is deployed to GitHub Pages from `main` via
-`.github/workflows/deploy.yml`.
+The app is deployed to GitHub Pages at
+<https://dankane2029.github.io/three-js-playground/> — every push to `main`
+rebuilds and republishes it via `.github/workflows/deploy.yml`.
 
 ## Architecture
 
