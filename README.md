@@ -46,11 +46,15 @@ Each app has an educational deep-dive — the concepts and math behind it — in
 
 ### Groovy Texture
 
+![Groovy Texture](docs/screenshots/groovy-texture.png)
+
 A vibrant 1970s-inspired five-pointed star. A fragment shader uses a signed
 distance function to draw color bands moving inward. The five colors, wave speed,
 and star size are all adjustable.
 
 ### Mandelbrot Set
+
+![Mandelbrot Set](docs/screenshots/mandelbrot-set.png)
 
 The famous fractal, computed in a fragment shader by iterating
 $Z_{n+1}=Z_n^2+C$ and coloring each pixel by how quickly the sequence escapes.
@@ -58,6 +62,8 @@ Drag to pan and scroll to zoom; the five gradient colors and iteration count are
 adjustable.
 
 ### Planet Generator
+
+![Planet Generator](docs/screenshots/planet-generator.png)
 
 A procedural mini planet. Seamless 3D simplex-noise FBM (sampled on the sphere,
 so there's no UV seam or pole pinching) displaces the surface in the vertex
@@ -72,10 +78,14 @@ level, amplitude, frequency, octaves, atmosphere, clouds, and biome colors.
 
 ### Bloom Field
 
+![Bloom Field](docs/screenshots/bloom-field.png)
+
 A ring of emissive shapes rendered through an `EffectComposer` pipeline with an
 `UnrealBloomPass`. Adjust the bloom strength, radius, and threshold.
 
 ### Particle Flow
+
+![Particle Flow](docs/screenshots/particle-flow.png)
 
 A GPU-driven particle field: every particle's animated position is computed in
 the vertex shader from its seed and time, plus a repulsion from the pointer. Move
@@ -84,16 +94,22 @@ strength, and color.
 
 ### PBR Viewer
 
+![PBR Viewer](docs/screenshots/pbr-viewer.png)
+
 A physically based scene lit by image-based lighting (`RoomEnvironment` via
 `PMREMGenerator`) with orbit controls. Adjust metalness, roughness, environment
 intensity, and auto-rotation.
 
 ### Pixelate
 
+![Pixelate](docs/screenshots/pixelate.png)
+
 A spinning shape run through a custom pixelate post-process shader (a `ShaderPass`
 that snaps output pixels to a grid). Adjust the pixel size.
 
 ### Raymarch SDF
+
+![Raymarch SDF](docs/screenshots/raymarch-sdf.png)
 
 A fullscreen raymarched signed-distance-field scene: three animated primitives
 fused with a smooth minimum, on a checkered floor with soft shadows, ambient
@@ -102,12 +118,16 @@ optional infinite domain repetition, fog, and the two-color palette.
 
 ### Mandelbulb
 
+![Mandelbulb](docs/screenshots/mandelbulb.png)
+
 A fullscreen raymarched Mandelbulb — the 3D analogue of the Mandelbrot set —
 using the classic distance estimator with orbit-trap coloring and a glow halo.
 Drag to orbit and scroll to zoom. Adjust the power (optionally animated),
 iteration count, glow, and colors.
 
 ### Fluid
+
+![Fluid](docs/screenshots/fluid.png)
 
 A real-time GPU fluid simulation: a grid-based Navier–Stokes solver (Jos Stam's
 "stable fluids") that ping-pongs velocity, dye, and pressure through
@@ -116,6 +136,8 @@ confinement, and a Jacobi pressure solve. Drag to stir dye through the flow.
 Adjust curl, dissipation, pressure iterations, and splat radius.
 
 ### Ocean
+
+![Ocean](docs/screenshots/ocean.png)
 
 A 3D ocean of Gerstner (trochoidal) waves displaced in the vertex shader, with
 analytic normals, a Fresnel blend between deep water and a reflected procedural
