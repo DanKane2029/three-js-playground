@@ -9,6 +9,21 @@ export interface AppContext {
 }
 
 /**
+ * A lazily-loaded app registration. The app's code is only imported when it is
+ * first opened, so each app (and its heavier Three.js addons) is a separate
+ * chunk rather than part of the initial bundle.
+ */
+export interface AppModule {
+	/**
+	 * Display name — drives the selector, the URL hash and the docs slug. Must
+	 * equal the loaded {@link App}'s `name`.
+	 */
+	name: string;
+	/** Import and instantiate the app on demand. */
+	load: () => Promise<App>;
+}
+
+/**
  * Base class every playground app extends. Each app owns its own `scene` and
  * `camera` and implements only the lifecycle hooks it needs. Controls are
  * declared by binding an app's `params` object to a Tweakpane folder inside
