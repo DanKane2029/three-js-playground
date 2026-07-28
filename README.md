@@ -34,7 +34,10 @@ and camera and implements the lifecycle hooks it needs (`setup`, `update`,
 [`Playground`](src/core/Playground.ts) orchestrator owns the renderer and render
 loop, handles resizing and pointer routing, and switches between apps. Controls
 are declared per app by binding a `params` object to a Tweakpane folder in
-`setupControls`, and each app disposes its GPU resources on teardown.
+`setupControls`, and each app disposes its GPU resources on teardown. The active
+app is mirrored in the URL hash (e.g. `#ocean`) so any experiment can be linked
+to directly, and each app's control panel has a **Read the docs** button linking
+to its deep-dive in [`docs/apps/`](docs/apps/).
 
 ### Scaffolding new apps
 
