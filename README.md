@@ -6,6 +6,10 @@ the top-right corner and tweak its parameters live.
 
 **▶ Live demo: <https://dankane2029.github.io/three-js-playground/>**
 
+Keyboard shortcuts: **←/→** switch apps · **f** fullscreen · **h** hide the UI
+for a clean view. The **Performance** panel shows a live FPS graph and a
+resolution control (lower it to trade sharpness for speed).
+
 **Stack:** Three.js · TypeScript · [Vite](https://vite.dev/) ·
 [Tweakpane](https://tweakpane.github.io/docs/) · ESLint 9 · Prettier 3.
 
@@ -52,7 +56,7 @@ Each app has an educational deep-dive — the concepts and math behind it — in
 
 ### Groovy Texture
 
-![Groovy Texture](docs/screenshots/groovy-texture.png)
+[![Groovy Texture](docs/screenshots/groovy-texture.png)](https://dankane2029.github.io/three-js-playground/#groovy-texture)
 
 A vibrant 1970s-inspired five-pointed star. A fragment shader uses a signed
 distance function to draw color bands moving inward. The five colors, wave speed,
@@ -60,7 +64,7 @@ and star size are all adjustable.
 
 ### Mandelbrot Set
 
-![Mandelbrot Set](docs/screenshots/mandelbrot-set.png)
+[![Mandelbrot Set](docs/screenshots/mandelbrot-set.png)](https://dankane2029.github.io/three-js-playground/#mandelbrot-set)
 
 The famous fractal, computed in a fragment shader by iterating
 $Z_{n+1}=Z_n^2+C$ and coloring each pixel by how quickly the sequence escapes.
@@ -69,7 +73,7 @@ adjustable.
 
 ### Planet Generator
 
-![Planet Generator](docs/screenshots/planet-generator.png)
+[![Planet Generator](docs/screenshots/planet-generator.png)](https://dankane2029.github.io/three-js-playground/#planet-generator)
 
 A procedural mini planet. Seamless 3D simplex-noise FBM (sampled on the sphere,
 so there's no UV seam or pole pinching) displaces the surface in the vertex
@@ -84,14 +88,14 @@ level, amplitude, frequency, octaves, atmosphere, clouds, and biome colors.
 
 ### Bloom Field
 
-![Bloom Field](docs/screenshots/bloom-field.png)
+[![Bloom Field](docs/screenshots/bloom-field.png)](https://dankane2029.github.io/three-js-playground/#bloom-field)
 
 A ring of emissive shapes rendered through an `EffectComposer` pipeline with an
 `UnrealBloomPass`. Adjust the bloom strength, radius, and threshold.
 
 ### Particle Flow
 
-![Particle Flow](docs/screenshots/particle-flow.png)
+[![Particle Flow](docs/screenshots/particle-flow.png)](https://dankane2029.github.io/three-js-playground/#particle-flow)
 
 A GPU-driven particle field: every particle's animated position is computed in
 the vertex shader from its seed and time, plus a repulsion from the pointer. Move
@@ -100,7 +104,7 @@ strength, and color.
 
 ### PBR Viewer
 
-![PBR Viewer](docs/screenshots/pbr-viewer.png)
+[![PBR Viewer](docs/screenshots/pbr-viewer.png)](https://dankane2029.github.io/three-js-playground/#pbr-viewer)
 
 A physically based scene lit by image-based lighting (`RoomEnvironment` via
 `PMREMGenerator`) with orbit controls. Adjust metalness, roughness, environment
@@ -108,14 +112,14 @@ intensity, and auto-rotation.
 
 ### Pixelate
 
-![Pixelate](docs/screenshots/pixelate.png)
+[![Pixelate](docs/screenshots/pixelate.png)](https://dankane2029.github.io/three-js-playground/#pixelate)
 
 A spinning shape run through a custom pixelate post-process shader (a `ShaderPass`
 that snaps output pixels to a grid). Adjust the pixel size.
 
 ### Raymarch SDF
 
-![Raymarch SDF](docs/screenshots/raymarch-sdf.png)
+[![Raymarch SDF](docs/screenshots/raymarch-sdf.png)](https://dankane2029.github.io/three-js-playground/#raymarch-sdf)
 
 A fullscreen raymarched signed-distance-field scene: three animated primitives
 fused with a smooth minimum, on a checkered floor with soft shadows, ambient
@@ -124,7 +128,7 @@ optional infinite domain repetition, fog, and the two-color palette.
 
 ### Mandelbulb
 
-![Mandelbulb](docs/screenshots/mandelbulb.png)
+[![Mandelbulb](docs/screenshots/mandelbulb.png)](https://dankane2029.github.io/three-js-playground/#mandelbulb)
 
 A fullscreen raymarched Mandelbulb — the 3D analogue of the Mandelbrot set —
 using the classic distance estimator with orbit-trap coloring and a glow halo.
@@ -133,7 +137,7 @@ iteration count, glow, and colors.
 
 ### Fluid
 
-![Fluid](docs/screenshots/fluid.png)
+[![Fluid](docs/screenshots/fluid.png)](https://dankane2029.github.io/three-js-playground/#fluid)
 
 A real-time GPU fluid simulation: a grid-based Navier–Stokes solver (Jos Stam's
 "stable fluids") that ping-pongs velocity, dye, and pressure through
@@ -143,7 +147,7 @@ Adjust curl, dissipation, pressure iterations, and splat radius.
 
 ### Ocean
 
-![Ocean](docs/screenshots/ocean.png)
+[![Ocean](docs/screenshots/ocean.png)](https://dankane2029.github.io/three-js-playground/#ocean)
 
 A 3D ocean of Gerstner (trochoidal) waves displaced in the vertex shader, with
 analytic normals, a Fresnel blend between deep water and a reflected procedural
