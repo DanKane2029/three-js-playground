@@ -17,15 +17,9 @@ export default function (plop) {
 			{
 				type: "append",
 				path: "../src/main.ts",
-				pattern: /@imported-apps-marker/g,
-				template:
-					'import { {{pascalCase name}} } from "./apps/{{name}}";',
-			},
-			{
-				type: "append",
-				path: "../src/main.ts",
 				pattern: /@app-list-marker/g,
-				template: "\tnew {{pascalCase name}}(),",
+				template:
+					'\t{\n\t\tname: "{{sentenceCase name}}",\n\t\tload: () => import("./apps/{{name}}").then((m) => new m.{{pascalCase name}}()),\n\t},',
 			},
 		],
 	});

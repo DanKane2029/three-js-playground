@@ -1,36 +1,63 @@
 import "./style.scss";
 
-import type { App } from "./core/App";
+import type { AppModule } from "./core/App";
 import { Playground } from "./core/Playground";
-
-// @imported-apps-marker
-import { GroovyTexture } from "./apps/GroovyTexture";
-import { MandelbrotSet } from "./apps/MandelbrotSet";
-import { TerrainGenerator } from "./apps/terrain_generator/TerrainGenerator";
-import { BloomField } from "./apps/BloomField";
-import { ParticleFlow } from "./apps/ParticleFlow";
-import { PbrViewer } from "./apps/PbrViewer";
-import { Pixelate } from "./apps/Pixelate";
-import { Raymarch } from "./apps/Raymarch";
-import { Mandelbulb } from "./apps/Mandelbulb";
-import { FluidSim } from "./apps/FluidSim";
-import { Ocean } from "./apps/Ocean";
 
 const canvas = document.getElementById("scene") as HTMLCanvasElement;
 
-const apps: App[] = [
+// Apps are registered lazily: each `load` dynamically imports the app so its
+// code (and heavier Three.js addons) only ships when the app is first opened.
+// `name` must match the app class's `name` — it drives the selector, the URL
+// hash and the docs slug.
+const apps: AppModule[] = [
 	// @app-list-marker
-	new GroovyTexture(),
-	new MandelbrotSet(),
-	new TerrainGenerator(),
-	new BloomField(),
-	new ParticleFlow(),
-	new PbrViewer(),
-	new Pixelate(),
-	new Raymarch(),
-	new Mandelbulb(),
-	new FluidSim(),
-	new Ocean(),
+	{
+		name: "Groovy Texture",
+		load: () => import("./apps/GroovyTexture").then((m) => new m.GroovyTexture()),
+	},
+	{
+		name: "Mandelbrot Set",
+		load: () => import("./apps/MandelbrotSet").then((m) => new m.MandelbrotSet()),
+	},
+	{
+		name: "Planet Generator",
+		load: () =>
+			import("./apps/terrain_generator/TerrainGenerator").then(
+				(m) => new m.TerrainGenerator()
+			),
+	},
+	{
+		name: "Bloom Field",
+		load: () => import("./apps/BloomField").then((m) => new m.BloomField()),
+	},
+	{
+		name: "Particle Flow",
+		load: () => import("./apps/ParticleFlow").then((m) => new m.ParticleFlow()),
+	},
+	{
+		name: "PBR Viewer",
+		load: () => import("./apps/PbrViewer").then((m) => new m.PbrViewer()),
+	},
+	{
+		name: "Pixelate",
+		load: () => import("./apps/Pixelate").then((m) => new m.Pixelate()),
+	},
+	{
+		name: "Raymarch SDF",
+		load: () => import("./apps/Raymarch").then((m) => new m.Raymarch()),
+	},
+	{
+		name: "Mandelbulb",
+		load: () => import("./apps/Mandelbulb").then((m) => new m.Mandelbulb()),
+	},
+	{
+		name: "Fluid",
+		load: () => import("./apps/FluidSim").then((m) => new m.FluidSim()),
+	},
+	{
+		name: "Ocean",
+		load: () => import("./apps/Ocean").then((m) => new m.Ocean()),
+	},
 ];
 
 new Playground(canvas, apps);
