@@ -32,6 +32,10 @@ export class Playground {
 	private readonly selector: { app: string };
 	private readonly appBinding: { refresh(): void };
 	private readonly instances = new Map<string, App>();
+	private readonly perf = {
+		fps: 0,
+		quality: Math.min(window.devicePixelRatio, 2),
+	};
 
 	private current?: App;
 	private appFolder: FolderApi | null = null;
@@ -69,6 +73,28 @@ export class Playground {
 				if (next && next.name !== this.current?.name)
 					void this.switchApp(next);
 			});
+
+		// Performance panel: a live FPS graph and a render-resolution control
+		// (lower it to trade sharpness for speed on weaker GPUs).
+		const perfFolder = this.pane.addFolder({
+			title: "Performance",
+			expanded: false,
+		});
+		perfFolder.addBinding(this.perf, "fps", {
+			readonly: true,
+			view: "graph",
+			min: 0,
+			max: 120,
+			interval: 100,
+		});
+		perfFolder
+			.addBinding(this.perf, "quality", {
+				label: "resolution",
+				min: 0.5,
+				max: 2,
+				step: 0.25,
+			})
+			.on("change", (ev) => this.setQuality(ev.value));
 
 		this.bindEvents(canvas);
 		this.renderer.setAnimationLoop(this.frame);
@@ -126,6 +152,17 @@ export class Playground {
 		this.syncSelection(entry, replaceHash);
 	}
 
+	/** Switch to the previous/next app in the list, wrapping around. */
+	cycle(delta: number): void {
+		const cur = this.current;
+		if (!cur) return;
+		const i = this.apps.findIndex((a) => a.name === cur.name);
+		if (i < 0) return;
+		const next =
+			this.apps[(i + delta + this.apps.length) % this.apps.length];
+		if (next.name !== cur.name) void this.switchApp(next);
+	}
+
 	/** Set up an already-instantiated app and (re)build its control folder. */
 	private mount(app: App): void {
 		const { width, height } = this.size;
@@ -135,7 +172,8 @@ export class Playground {
 		this.current = app;
 
 		this.appFolder?.dispose();
-		this.appFolder = this.pane.addFolder({ title: app.name });
+		// index 1 keeps the app folder above the Performance folder on switch.
+		this.appFolder = this.pane.addFolder({ title: app.name, index: 1 });
 		this.appFolder
 			.addButton({ title: "📖 Read the docs" })
 			.on("click", () =>
@@ -171,9 +209,17 @@ export class Playground {
 	private frame = (): void => {
 		if (!this.current) return;
 		const dt = this.clock.getDelta();
+		// Smoothed FPS for the Performance panel (the monitor polls perf.fps).
+		if (dt > 0) this.perf.fps += (1 / dt - this.perf.fps) * 0.1;
 		this.current.update(dt, this.clock.elapsedTime);
 		this.current.render(this.renderer);
 	};
+
+	/** Change the device-pixel-ratio the renderer draws at (quality vs. speed). */
+	private setQuality(ratio: number): void {
+		this.renderer.setPixelRatio(ratio);
+		this.resize();
+	}
 
 	private resize = (): void => {
 		const { width, height } = this.size;
