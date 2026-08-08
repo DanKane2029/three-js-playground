@@ -4,7 +4,11 @@ import type { FolderApi } from "tweakpane";
 import { App } from "../core/App";
 import { createFullscreenQuad } from "../core/fullscreenQuad";
 import { hexToVec4 } from "../core/color";
-import { BAILOUT, MandlebrotSetShader } from "../shaders/mandlebrotSetShader";
+import {
+	BAILOUT,
+	DEEP_ZOOM_LOG2,
+	MandlebrotSetShader,
+} from "../shaders/mandlebrotSetShader";
 import type { BigFixed } from "../core/bigFixed";
 import { DeepView } from "./mandelbrot/deepView";
 import { computeReferenceOrbit } from "./mandelbrot/referenceOrbit";
@@ -82,7 +86,11 @@ export class MandelbrotSet extends App {
 		depth: "1e+0",
 		iterations: MIN_ITERATIONS,
 		orbit: 0,
+		precision: "float32",
 	};
+
+	/** Whether the floatexp shader variant is currently compiled. */
+	private deepMode = false;
 
 	private material!: ShaderMaterial;
 	private geometry!: PlaneGeometry;
@@ -119,7 +127,8 @@ export class MandelbrotSet extends App {
 		this.material = new ShaderMaterial(
 			MandlebrotSetShader({
 				maxIterations: MIN_ITERATIONS,
-				scale: this.view.scaleAsNumber,
+				scaleMantissa: this.view.scaleMantissa,
+				scaleExp: this.view.scaleExp,
 				resolution: this.resolution,
 				refOffset: this.refOffset,
 				refOrbit: null,
@@ -230,6 +239,24 @@ export class MandelbrotSet extends App {
 		this.worker.postMessage(job);
 	}
 
+	/**
+	 * Recompiles the shader when the view crosses into (or back out of) the
+	 * depth where float32 can no longer hold delta. The floatexp path costs
+	 * several times more per iteration, so it is not worth paying for at depths
+	 * the plain path handles correctly.
+	 */
+	private syncPrecisionMode(): void {
+		const deep = this.view.depthLog2 < DEEP_ZOOM_LOG2;
+		if (deep === this.deepMode) return;
+		this.deepMode = deep;
+
+		const defines = this.material.defines as Record<string, unknown>;
+		if (deep) defines.DEEP_ZOOM = "";
+		else delete defines.DEEP_ZOOM;
+		this.material.needsUpdate = true;
+		this.readout.precision = deep ? "floatexp" : "float32";
+	}
+
 	update(): void {
 		const iterations = iterationsForDepth(
 			this.view.depthDecades,
@@ -245,16 +272,23 @@ export class MandelbrotSet extends App {
 			this.refOffset.set(o.x, o.y);
 		}
 
+		this.syncPrecisionMode();
+
 		const u = this.material.uniforms;
 		u.maxIterations.value = iterations;
-		u.scale.value = this.view.scaleAsNumber;
+		u.scaleMantissa.value = this.view.scaleMantissa;
+		u.scaleExp.value = this.view.scaleExp;
 		u.resolution.value = this.resolution;
 		u.refOffset.value = this.refOffset;
 		u.colorCycle.value = this.params.colorCycle;
 		u.colorList.value = this.colorVectors();
 
 		this.readout.iterations = iterations;
-		this.readout.depth = `${(2 ** this.view.depthLog2).toExponential(1)}`;
+		// Formatted from the log directly: 2 ** depthLog2 would underflow to
+		// zero past ~1e-308, which is well inside the range this now reaches.
+		const log10 = this.view.depthLog2 * Math.LOG10E * Math.LN2;
+		const exponent = Math.floor(log10);
+		this.readout.depth = `${(10 ** (log10 - exponent)).toFixed(2)}e${exponent}`;
 	}
 
 	onPointerDown(event: PointerEvent): void {
@@ -320,6 +354,10 @@ export class MandelbrotSet extends App {
 			label: "Orbit length",
 			readonly: true,
 			format: (v: number) => v.toFixed(0),
+		});
+		view.addBinding(this.readout, "precision", {
+			label: "Precision",
+			readonly: true,
 		});
 
 		const colors = folder.addFolder({ title: "Colors" });

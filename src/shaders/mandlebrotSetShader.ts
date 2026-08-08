@@ -5,6 +5,14 @@ import type {
 	Vector2,
 	Vector4,
 } from "three";
+import { floatExpGLSL } from "./glsl/floatexp";
+
+/**
+ * Depth (as log2 of the view half-height) below which the shader switches to
+ * floatexp arithmetic. Chosen with room to spare above float32's ~1e-38 floor,
+ * since delta degrades for a while before it underflows outright.
+ */
+export const DEEP_ZOOM_LOG2 = -100;
 
 /**
  * Escape radius for the iteration. Deliberately large: the smooth (fractional)
@@ -135,10 +143,62 @@ const perturbationGLSL = /* glsl */ `
 	}
 `;
 
+/**
+ * The same loop with eps and delta carried as floatexp, for depths past the
+ * float32 exponent floor. Structurally identical to perturbedEscape above —
+ * only the arithmetic changes — but every operation renormalises, so it is
+ * several times slower and is compiled only when the view is deep enough to
+ * need it.
+ */
+const perturbationDeepGLSL = /* glsl */ `
+	vec2 perturbedEscapeDeep(FE dcr, FE dci, int maxIterations) {
+		FE er = FE(0.0, 0.0), ei = FE(0.0, 0.0);
+		int m = 0;
+
+		for (int i = 0; i < maxIterations; i++) {
+			vec2 Z = fetchZ(m);
+			// a = 2*Z + eps
+			FE ar = feAdd(feFromFloat(2.0 * Z.x), er);
+			FE ai = feAdd(feFromFloat(2.0 * Z.y), ei);
+			// eps = a*eps + dc
+			FE nr = feAdd(feSub(feMul(ar, er), feMul(ai, ei)), dcr);
+			FE ni = feAdd(feAdd(feMul(ar, ei), feMul(ai, er)), dci);
+			er = nr; ei = ni;
+			m++;
+
+			vec2 Zn = fetchZ(m);
+			FE zr = feAdd(feFromFloat(Zn.x), er);
+			FE zi = feAdd(feFromFloat(Zn.y), ei);
+			FE z2 = feAdd(feMul(zr, zr), feMul(zi, zi));
+
+			// BAILOUT^2 = 65536 = 0.5 * 2^17
+			if (feGreater(z2, FE(0.5, 17.0))) {
+				// |z| > BAILOUT here, so this is safely inside the float range.
+				return vec2(
+					smoothIter(float(i), vec2(feToFloat(zr), feToFloat(zi))),
+					1.0
+				);
+			}
+
+			FE e2 = feAdd(feMul(er, er), feMul(ei, ei));
+			if (feLess(z2, e2) || m >= refLen - 1) {
+				er = zr; ei = zi; m = 0;
+			}
+		}
+
+		return vec2(0.0, 0.0);
+	}
+`;
+
 export interface MandelbrotUniforms {
 	maxIterations: number;
-	/** Half the view height, in complex-plane units. */
-	scale: number;
+	/**
+	 * Half the view height as `scaleMantissa * 2^scaleExp`. Split rather than
+	 * passed as one float because a single float32 uniform cannot carry a scale
+	 * below ~1e-38, which is precisely the limit this split removes.
+	 */
+	scaleMantissa: number;
+	scaleExp: number;
 	resolution: Vector2;
 	/** Centre minus reference point, in units of `scale`. */
 	refOffset: Vector2;
@@ -165,9 +225,14 @@ const MandlebrotSetShader = (
 		// reference orbit by integer iteration number.
 		glslVersion: GLSL3,
 
+		// Populated by the app when the view crosses DEEP_ZOOM_LOG2; flipping it
+		// recompiles the program with the floatexp path.
+		defines: {},
+
 		uniforms: {
 			maxIterations: { value: init.maxIterations },
-			scale: { value: init.scale },
+			scaleMantissa: { value: init.scaleMantissa },
+			scaleExp: { value: init.scaleExp },
 			resolution: { value: init.resolution },
 			refOffset: { value: init.refOffset },
 			refOrbit: { value: init.refOrbit },
@@ -196,7 +261,8 @@ const MandlebrotSetShader = (
 		out vec4 fragColor;
 
 		uniform int maxIterations;
-		uniform float scale;
+		uniform float scaleMantissa;
+		uniform float scaleExp;
 		uniform vec2 resolution;
 		uniform vec2 refOffset;
 		uniform float colorCycle;
@@ -204,6 +270,11 @@ const MandlebrotSetShader = (
 
 		${paletteGLSL}
 		${perturbationGLSL}
+
+		#ifdef DEEP_ZOOM
+		${floatExpGLSL}
+		${perturbationDeepGLSL}
+		#endif
 
 		void main() {
 			vec4 stops[numColors] = vec4[numColors](
@@ -228,9 +299,22 @@ const MandlebrotSetShader = (
 			// current centre and the point the orbit was actually computed for,
 			// which is non-zero only while a fresh orbit is still in flight.
 			float aspect = resolution.x / resolution.y;
-			vec2 dc = (vPos * vec2(aspect, 1.0) + refOffset) * scale;
+			vec2 t = vPos * vec2(aspect, 1.0) + refOffset;
 
-			vec2 result = perturbedEscape(dc, maxIterations);
+			#ifdef DEEP_ZOOM
+			// Fold the scale in as an exponent rather than a multiply, so no
+			// intermediate ever has to be representable as a float32.
+			vec2 result = perturbedEscapeDeep(
+				feNorm(t.x * scaleMantissa, scaleExp),
+				feNorm(t.y * scaleMantissa, scaleExp),
+				maxIterations
+			);
+			#else
+			vec2 result = perturbedEscape(
+				t * (scaleMantissa * exp2(scaleExp)),
+				maxIterations
+			);
+			#endif
 
 			// Points still bounded at the cap are treated as interior. Running
 			// the smooth-iteration formula on them would take the log of a
