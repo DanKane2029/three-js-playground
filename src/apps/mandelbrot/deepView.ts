@@ -148,6 +148,24 @@ export class DeepView {
 		this.im = rescale(this.im, want);
 	}
 
+	/**
+	 * Displacement from a reference point to this view's centre, measured in
+	 * units of the view's half-height.
+	 *
+	 * The ratio is what makes this safe: the raw displacement is on the order of
+	 * the scale itself and would flush to zero as a double long before the zoom
+	 * runs out, whereas the ratio stays O(1) at any depth. Dividing out the
+	 * scale as an exact bit shift keeps it that way.
+	 */
+	offsetInScreenUnits(re: BigFixed, im: BigFixed): { x: number; y: number } {
+		const norm = (d: BigFixed): number =>
+			toNumber(shl(d, -this.scaleExp)) / this.scaleMantissa;
+		return {
+			x: norm(sub(this.re, re)),
+			y: norm(sub(this.im, im)),
+		};
+	}
+
 	/** Centre as doubles. For display only — meaningless past ~15 decades. */
 	centerAsNumbers(): { re: number; im: number } {
 		return { re: toNumber(this.re), im: toNumber(this.im) };
